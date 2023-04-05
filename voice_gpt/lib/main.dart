@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:voice_gpt/constants/constants.dart';
+import 'package:voice_gpt/providers/chat_provider.dart';
 import 'package:voice_gpt/providers/model_provider.dart';
 import 'package:voice_gpt/screens/chat_screen.dart';
 
@@ -15,7 +16,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => ModelsProvider())],
+        providers: [
+          ChangeNotifierProvider(create: (_) => ModelsProvider()),
+          ChangeNotifierProvider(create: (_) => ChatProvider())
+        ],
         child: (MaterialApp(
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: false,
