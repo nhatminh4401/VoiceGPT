@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:voice_gpt/models/chat_model.dart';
 import 'package:voice_gpt/services/api_service.dart';
 import 'package:voice_gpt/services/asset_manager.dart';
 import 'package:voice_gpt/services/services.dart';
@@ -22,19 +23,22 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   bool _isTyping = false;
   late TextEditingController textEditingController;
-
+  late FocusNode focusNode;
   @override
   void initState() {
     textEditingController = TextEditingController();
     super.initState();
+    focusNode = FocusNode();
   }
 
   @override
   void dispose() {
     textEditingController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
+  List<ChatModel> chatList = [];
   @override
   Widget build(BuildContext context) {
     final modelsProvider = Provider.of<ModelsProvider>(context);
@@ -62,11 +66,11 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Flexible(
               child: ListView.builder(
-                  itemCount: 6,
+                  itemCount: chatList.length,
                   itemBuilder: (context, index) {
                     return ChatWidget(
-                      msg: chatMsg[index]["msg"].toString(),
-                      chatIdx: int.parse(chatMsg[index]["chatIdx"].toString()),
+                      msg: chatList[index].msg,
+                      chatIdx: chatList[index].chatIdx,
                     );
                   })),
           if (_isTyping) ...[
@@ -84,10 +88,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: [
                   Expanded(
                       child: TextField(
+                    focusNode: focusNode,
                     style: const TextStyle(color: Colors.white),
                     controller: textEditingController,
-                    onSubmitted: (value) {
-                      // send msg
+                    onSubmitted: (value) async {
+                      await sendMessage(modelsProvider: modelsProvider);
                     },
                     decoration: const InputDecoration.collapsed(
                         hintText: "How can I help you?",
@@ -95,21 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   )),
                   IconButton(
                       onPressed: () async {
-                        try {
-                          print('Sending...');
-                          setState(() {
-                            _isTyping = true;
-                          });
-                          final list = await ApiService.sendMessage(
-                              message: textEditingController.text,
-                              modelId: modelsProvider.getCurrentModel);
-                        } catch (error) {
-                          print("error: $error");
-                        } finally {
-                          setState(() {
-                            _isTyping = false;
-                          });
-                        }
+                        await sendMessage(modelsProvider: modelsProvider);
                       },
                       icon: Icon(
                         Icons.send,
@@ -122,5 +113,27 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       )),
     );
+  }
+
+  Future<void> sendMessage({required ModelsProvider modelsProvider}) async {
+    try {
+      print('Sending...');
+      setState(() {
+        _isTyping = true;
+        chatList.add(ChatModel(msg: textEditingController.text, chatIdx: 0));
+        textEditingController.clear();
+        focusNode.unfocus();
+      });
+      chatList.addAll(await ApiService.sendMessage(
+          message: textEditingController.text,
+          modelId: modelsProvider.getCurrentModel));
+      setState(() {});
+    } catch (error) {
+      print("error: $error");
+    } finally {
+      setState(() {
+        _isTyping = false;
+      });
+    }
   }
 }

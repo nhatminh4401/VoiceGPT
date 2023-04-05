@@ -35,7 +35,7 @@ class ApiService {
     }
   }
 
-  // Send Message fct
+  // Send Message function
   static Future<List<ChatModel>> sendMessage(
       {required String message, required String modelId}) async {
     try {
@@ -53,7 +53,7 @@ class ApiService {
           },
         ),
       );
-
+      print('SENDED: $message, $modelId');
       Map jsonResponse = jsonDecode(response.body);
 
       print('response11 $jsonResponse');
