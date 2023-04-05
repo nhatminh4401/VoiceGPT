@@ -160,7 +160,8 @@ class _ChatScreenState extends State<ChatScreen> {
         focusNode.unfocus();
       });
       await chatProvider.sendMessageAndGetAnswers(
-          msg: msg, chosenModelId: modelsProvider.getCurrentModel);
+          msg: chatProvider.chatList,
+          chosenModelId: modelsProvider.getCurrentModel);
       // chatList.addAll(await ApiService.sendMessage(
       //     message: textEditingController.text,
       //     modelId: modelsProvider.getCurrentModel));

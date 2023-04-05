@@ -20,10 +20,10 @@ class Services {
               children: [
                 Flexible(
                     child: TextWidget(
-                  label: "Choose model",
+                  label: "Current model: gpt-3.5-turbo",
                   fontSize: 16,
                 )),
-                Flexible(flex: 2, child: ModelsDrowDownWidget())
+                // Flexible(flex: 2, child: ModelsDrowDownWidget())
               ],
             ),
           );
