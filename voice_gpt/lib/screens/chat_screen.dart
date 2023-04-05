@@ -134,8 +134,24 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> sendMessage(
       {required ModelsProvider modelsProvider,
       required ChatProvider chatProvider}) async {
+    if (_isTyping) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content:
+            TextWidget(label: "You can't send multiple messages at a time"),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+    if (textEditingController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: TextWidget(label: "Please type a message"),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
     try {
       print('Sending...');
+      String msg = textEditingController.text;
       setState(() {
         _isTyping = true;
         // chatList.add(ChatModel(msg: textEditingController.text, chatIdx: 0));
@@ -144,14 +160,17 @@ class _ChatScreenState extends State<ChatScreen> {
         focusNode.unfocus();
       });
       await chatProvider.sendMessageAndGetAnswers(
-          msg: textEditingController.text,
-          chosenModelId: modelsProvider.getCurrentModel);
+          msg: msg, chosenModelId: modelsProvider.getCurrentModel);
       // chatList.addAll(await ApiService.sendMessage(
       //     message: textEditingController.text,
       //     modelId: modelsProvider.getCurrentModel));
       setState(() {});
     } catch (error) {
       print("error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: TextWidget(label: error.toString()),
+        backgroundColor: Colors.red,
+      ));
     } finally {
       setState(() {
         scrollListToEnd();

@@ -48,8 +48,12 @@ class ApiService {
         body: jsonEncode(
           {
             "model": modelId,
-            "prompt": message,
-            "max_tokens": 100,
+            "messages": message,
+            "max_tokens": 4000,
+            "temperature": 0,
+            "top_p": 1,
+            "frequency_penalty": 0.0,
+            "presence_penalty": 0.0,
           },
         ),
       );
