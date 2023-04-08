@@ -7,54 +7,84 @@ import 'package:voice_gpt/widgets/text_widget.dart';
 
 import '../constants/constants.dart';
 
-class ChatWidget extends StatelessWidget {
-  const ChatWidget({super.key, required this.msg, required this.chatIdx});
+class ChatWidget extends StatefulWidget {
+  ChatWidget({super.key, required this.msg, required this.chatIdx});
 
   final String msg;
   final int chatIdx;
+
+  @override
+  _ChatWidgetState createState() => _ChatWidgetState();
+}
+
+class _ChatWidgetState extends State<ChatWidget> {
+  bool isPlayingListenBtn = true;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Material(
-          color: chatIdx == 0 ? scaffoldBackgroundColor : cardColor,
+          color: widget.chatIdx == 0 ? scaffoldBackgroundColor : cardColor,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
               children: [
-                Image.asset(
-                  chatIdx == 0
-                      ? AssetsManager.userImage
-                      : AssetsManager.openaiLogo,
-                  height: 30,
-                  width: 30,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      widget.chatIdx == 0
+                          ? AssetsManager.userImage
+                          : AssetsManager.openaiLogo,
+                      height: 30,
+                      width: 30,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Expanded(
+                      child: widget.chatIdx == 0
+                          ? TextWidget(
+                              label: widget.msg,
+                            )
+                          : DefaultTextStyle(
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16),
+                              child: Text(widget.msg),
+                              // child: AnimatedTextKit(
+                              //     pause: Duration(milliseconds: 0),
+                              //     isRepeatingAnimation: false,
+                              //     repeatForever: false,
+                              //     displayFullTextOnTap: true,
+                              //     totalRepeatCount: 1,
+                              //     animatedTexts: [TyperAnimatedText(msg.trim())])
+                            ),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                  child: chatIdx == 0
-                      ? TextWidget(
-                          label: msg,
-                        )
-                      : DefaultTextStyle(
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16),
-                          child: AnimatedTextKit(
-                              pause: Duration(milliseconds: 0),
-                              isRepeatingAnimation: false,
-                              repeatForever: false,
-                              displayFullTextOnTap: true,
-                              totalRepeatCount: 1,
-                              animatedTexts: [TyperAnimatedText(msg.trim())])),
+                Visibility(
+                  visible: widget.chatIdx == 1,
+                  child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isPlayingListenBtn = !isPlayingListenBtn;
+                        });
+                      },
+                      icon: Icon(
+                        size: 40,
+                        isPlayingListenBtn
+                            ? Icons.play_circle
+                            : Icons.stop_circle,
+                        color: Colors.white,
+                      )),
                 ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }

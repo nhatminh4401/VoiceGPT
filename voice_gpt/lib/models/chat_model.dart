@@ -1,6 +1,6 @@
 class ChatModel {
-  final String msg;
-  final int chatIdx;
+  late final String msg;
+  late final int chatIdx;
 
   ChatModel({required this.msg, required this.chatIdx});
 

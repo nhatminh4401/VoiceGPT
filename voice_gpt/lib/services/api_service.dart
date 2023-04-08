@@ -75,6 +75,7 @@ class ApiService {
                       : OpenAIChatMessageRole.assistant,
                   content: e.msg))
               .toList());
+
       print('SENDED: $message, $modelId');
       // Map jsonResponse = jsonDecode(response.body);
 
@@ -105,6 +106,18 @@ class ApiService {
           ),
         );
       }
+      // res.listen((chatStreamEvent) {
+      //   print(chatStreamEvent.choices.first.delta.content); // ...
+      //   if (chatStreamEvent.choices.length > 0) {
+      //     chatList = List.generate(
+      //       chatStreamEvent.choices.length,
+      //       (index) => ChatModel(
+      //         msg: chatStreamEvent.choices.first.delta.content.toString(),
+      //         chatIdx: 1,
+      //       ),
+      //     );
+      //   }
+      // });
       return chatList;
     } catch (error) {
       log("error $error");
