@@ -3,6 +3,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:voice_gpt/models/chat_model.dart';
 import 'package:voice_gpt/providers/chat_provider.dart';
 import 'package:voice_gpt/services/api_service.dart';
@@ -28,12 +30,16 @@ class _ChatScreenState extends State<ChatScreen> {
   late TextEditingController textEditingController;
   late ScrollController scrollController;
   late FocusNode focusNode;
+  SpeechToText speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
   @override
   void initState() {
     scrollController = ScrollController();
     textEditingController = TextEditingController();
     super.initState();
     focusNode = FocusNode();
+    initSpeechToText();
   }
 
   @override
@@ -42,6 +48,30 @@ class _ChatScreenState extends State<ChatScreen> {
     textEditingController.dispose();
     focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> initSpeechToText() async {
+    await speechToText.initialize();
+    _speechEnabled = await speechToText.initialize();
+    setState(() {});
+  }
+
+  /// Each time to start a speech recognition session
+  void _startListening() async {
+    await speechToText.listen(onResult: _onSpeechResult);
+    setState(() {});
+  }
+
+  void _stopListening() async {
+    await speechToText.stop();
+    setState(() {});
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+      print('listen res: $_lastWords');
+    });
   }
 
   // List<ChatModel> chatList = [];
@@ -107,6 +137,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         hintText: "How can I help you?",
                         hintStyle: TextStyle(color: Colors.grey)),
                   )),
+                  Text("$_lastWords"),
+                  FloatingActionButton(
+                    onPressed:
+                        // If not yet listening for speech start, otherwise stop
+                        speechToText.isNotListening
+                            ? _startListening
+                            : _stopListening,
+                    tooltip: 'Listen',
+                    child: Icon(speechToText.isNotListening
+                        ? Icons.mic_off
+                        : Icons.mic),
+                  ),
                   IconButton(
                       onPressed: () async {
                         await sendMessage(
