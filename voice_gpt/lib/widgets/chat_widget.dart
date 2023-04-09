@@ -2,6 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:voice_gpt/services/asset_manager.dart';
 import 'package:voice_gpt/widgets/text_widget.dart';
 
@@ -19,6 +20,10 @@ class ChatWidget extends StatefulWidget {
 
 class _ChatWidgetState extends State<ChatWidget> {
   bool isPlayingListenBtn = true;
+  double volume = 1.0;
+  double pitch = 1.0;
+  double rate = 0.5;
+  FlutterTts flutterTts = FlutterTts();
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +73,17 @@ class _ChatWidgetState extends State<ChatWidget> {
                 Visibility(
                   visible: widget.chatIdx == 1,
                   child: IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           isPlayingListenBtn = !isPlayingListenBtn;
                         });
+                        // if (isPlayingListenBtn == true) {
+                        //   _stop();
+                        // } else {
+                        print('speak');
+                        await _speak(widget.msg);
+
+                        // }
                       },
                       icon: Icon(
                         size: 40,
@@ -87,5 +99,18 @@ class _ChatWidgetState extends State<ChatWidget> {
         ),
       ],
     );
+  }
+
+  Future _speak(String msg) async {
+    await flutterTts.setVolume(volume);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(pitch);
+    await flutterTts.setLanguage("en-US");
+    var res = await flutterTts.speak(msg);
+    print('res $res');
+  }
+
+  void _stop() async {
+    await flutterTts.stop();
   }
 }
