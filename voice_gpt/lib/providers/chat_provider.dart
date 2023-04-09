@@ -26,6 +26,12 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearChatList() async {
+    chatList = [];
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+
   Future<void> saveMessageToLocal() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('msg', chatList.map((e) => e.msg).toList());

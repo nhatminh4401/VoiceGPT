@@ -74,11 +74,15 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {});
   }
 
+  void _cancelListening() async {
+    await speechToText.cancel();
+    setState(() {});
+  }
+
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-      _lastWords = result.recognizedWords;
-      textEditingController.text = _lastWords;
-      print('listen res: $_lastWords');
+      textEditingController.text = result.recognizedWords;
+      showSendBtn = true;
     });
   }
 
@@ -149,6 +153,11 @@ class _ChatScreenState extends State<ChatScreen> {
                             });
                           }
                         },
+                        onEditingComplete: () {
+                          setState(() {
+                            showSendBtn = false;
+                          });
+                        },
                         onSubmitted: (value) async {
                           await sendMessage(
                               modelsProvider: modelsProvider,
@@ -181,18 +190,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: Center(
                       child: Visibility(
-                        visible: showSendBtn,
+                        visible: chatProvider.chatList.isNotEmpty,
                         child: IconButton(
                             onPressed: () {
-                              textEditingController.clear();
-                              setState(() {
-                                showSendBtn = false;
-                              });
+                              chatProvider.clearChatList();
+                              setState(() {});
                             },
                             icon: Icon(
                               size: 30,
                               Icons.delete,
-                              color: Colors.white,
+                              color: Colors.red,
                             )),
                       ),
                     ),
@@ -218,7 +225,40 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
-                  const Spacer(),
+                  Expanded(
+                    child: Center(
+                      child: Visibility(
+                          visible: showSendBtn,
+                          child:
+                              // IconButton(
+                              //     onPressed: () {
+                              //       textEditingController.clear();
+                              //       setState(() {
+                              //         showSendBtn = false;
+                              //       });
+                              //     },
+                              //     icon: Icon(
+                              //       size: 30,
+                              //       Icons.delete,
+                              //       color: Colors.white,
+                              //     )),
+                              TextButton(
+                                  onPressed: () {
+                                    if (speechToText.isNotListening == false) {
+                                      _cancelListening();
+                                    }
+                                    textEditingController.clear();
+                                    setState(() {
+                                      showSendBtn = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    'Clear text',
+                                    style: TextStyle(fontSize: 20),
+                                  ))),
+                    ),
+                  ),
+                  // const Spacer(),
                 ],
               )
             ],
