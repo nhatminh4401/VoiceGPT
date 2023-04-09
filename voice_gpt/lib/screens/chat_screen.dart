@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
         leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(AssetsManager.openaiLogo)),
-        title: Text("Chat"),
+        title: Center(child: Text("Chat")),
         actions: [
           IconButton(
               onPressed: () async {
@@ -222,7 +222,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               )
             ],
-          )
+          ),
+          SizedBox(height: 10),
         ],
       )),
     );

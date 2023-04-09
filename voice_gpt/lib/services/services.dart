@@ -20,7 +20,8 @@ class Services {
               children: [
                 Flexible(
                     child: TextWidget(
-                  label: "Current model: gpt-3.5-turbo",
+                  label:
+                      "Current model: gpt-3.5-turbo \nAuthor: Đoàn Nhật Minh \nLanguage: English \nVersion: 1.0.0",
                   fontSize: 16,
                 )),
                 // Flexible(flex: 2, child: ModelsDrowDownWidget())

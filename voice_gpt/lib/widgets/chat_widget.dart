@@ -77,22 +77,24 @@ class _ChatWidgetState extends State<ChatWidget> {
                         setState(() {
                           isPlayingListenBtn = !isPlayingListenBtn;
                         });
-                        // if (isPlayingListenBtn == true) {
-                        //   _stop();
-                        // } else {
-                        print('speak');
-                        await _speak(widget.msg);
-
-                        // }
+                        if (isPlayingListenBtn == true) {
+                          _stop();
+                        } else {
+                          print('speak');
+                          await _speak(widget.msg);
+                        }
                       },
                       icon: Icon(
-                        size: 40,
+                        size: 50,
                         isPlayingListenBtn
                             ? Icons.play_circle
                             : Icons.stop_circle,
                         color: Colors.white,
                       )),
                 ),
+                SizedBox(
+                  height: 10,
+                )
               ],
             ),
           ),
@@ -107,6 +109,11 @@ class _ChatWidgetState extends State<ChatWidget> {
     await flutterTts.setPitch(pitch);
     await flutterTts.setLanguage("en-US");
     var res = await flutterTts.speak(msg);
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        isPlayingListenBtn = !isPlayingListenBtn;
+      });
+    });
     print('res $res');
   }
 
